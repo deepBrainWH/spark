@@ -9,9 +9,9 @@ object RDDOne {
     conf.setAppName("RDDOne").setMaster("spark://dell:7077")
     var sc = new SparkContext(conf)
 
-    var textFile = sc.textFile("hdfs://localhost:9000/data/word/")
-    val worldCounts = textFile.flatMap(line=>line.split(" ")).map((word=>(word, 1))).reduceByKey(_+_)
-    worldCounts.collect.foreach(println)
+    var textFile = sc.textFile("hdfs://localhost:9000/data/word/world.txt")
+    var num = textFile.flatMap(x=>x.split(" ")).filter(_.contains("a")).count()
+    println("words with a: %s".format(num))
     sc.stop()
   }
 
