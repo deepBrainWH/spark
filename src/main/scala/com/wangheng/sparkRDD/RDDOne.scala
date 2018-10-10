@@ -14,5 +14,4 @@ object RDDOne {
     println("words with a: %s".format(num))
     sc.stop()
   }
-
 }
