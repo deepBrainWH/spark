@@ -18,7 +18,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.wangheng.sparkRDD.RDDOne</mainClass>
+                            <mainClass>com.wangheng.sparkRDD.WordCount</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
