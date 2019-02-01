@@ -6,10 +6,12 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.VoidFunction;
 import scala.Tuple2;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,7 +23,10 @@ public class Transformation {
 //        map();
 //        filter();
 //        flatMap();
-        groupByKey();
+//        groupByKey();
+//        reduceByKey();
+//        sortByKey();
+        join();
     }
 
     /**
@@ -139,4 +144,107 @@ public class Transformation {
 
         sc.close();
     }
+
+    /**
+     * reduceByKey: static each class's all score.
+     */
+    private static void reduceByKey(){
+        SparkConf conf = new SparkConf()
+                .setAppName("map option")
+                .setMaster("local");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+
+        final List<Tuple2<String, Integer>> score = Arrays.asList(
+                new Tuple2<String, Integer>("class1", 90),
+                new Tuple2<String, Integer>("class2", 78),
+                new Tuple2<String, Integer>("class1", 67),
+                new Tuple2<String, Integer>("class3", 99));
+
+        JavaPairRDD<String, Integer> scoresrdd = sc.parallelizePairs(score);
+        /**
+         * reduceBykey接受的参数是Functon2类型，它有三个泛型参数，实际上代表了三个只
+         * 第一个和第二个代表的是原始RDD的输入值
+         * 第三个反省参数类型代表的是返回值的类型。
+         */
+        JavaPairRDD<String, Integer> totalscores = scoresrdd.reduceByKey(new Function2<Integer, Integer, Integer>() {
+            @Override
+            public Integer call(Integer integer, Integer integer2) throws Exception {
+                return integer + integer2;
+            }
+        });
+
+        totalscores.foreach(new VoidFunction<Tuple2<String, Integer>>() {
+            @Override
+            public void call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
+                System.out.println(stringIntegerTuple2._1() + " all scores is :" + stringIntegerTuple2._2());
+            }
+        });
+    }
+
+    /**
+     * SortByKey
+     */
+    private static void sortByKey(){
+        SparkConf conf = new SparkConf()
+                .setMaster("local")
+                .setAppName("SortByKey");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+        List<Tuple2<Integer, String>> scores = Arrays.asList(new Tuple2<Integer, String>(89, "xiaoming"),
+                new Tuple2<Integer, String>(84, "wangheng"),
+                new Tuple2<Integer, String>(99, "huanhuan"));
+        JavaPairRDD<Integer, String> scoresRDD = sc.parallelizePairs(scores);
+        JavaPairRDD<Integer, String> sorted_scores = scoresRDD.sortByKey(true);
+        sorted_scores.foreach(new VoidFunction<Tuple2<Integer, String>>() {
+            @Override
+            public void call(Tuple2<Integer, String> integerStringTuple2) throws Exception {
+                System.out.println(integerStringTuple2._1 + " : " + integerStringTuple2._2);
+            }
+        });
+        sc.close();
+    }
+
+    /**
+     * Join 关联两个RDD
+     * join example.
+     */
+    private static void join(){
+        SparkConf conf = new SparkConf()
+                .setMaster("local")
+                .setAppName("SortByKey");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+        List<Tuple2<Integer, String>> student_list1 = Arrays.asList(
+                new Tuple2<Integer, String>(1, "s1"),
+                new Tuple2<Integer, String>(2, "s2"),
+                new Tuple2<Integer, String>(3, "s3"),
+                new Tuple2<Integer, String>(4, "s4"));
+
+        List<Tuple2<Integer, Integer>> student_list2 = Arrays.asList(
+                new Tuple2<Integer, Integer>(1, 100),
+                new Tuple2<Integer, Integer>(2, 89),
+                new Tuple2<Integer, Integer>(3, 87),
+                new Tuple2<Integer, Integer>(5, 88));
+
+        //并行化两个RDD
+        JavaPairRDD<Integer, String> student = sc.parallelizePairs(student_list1);
+        JavaPairRDD<Integer, Integer> scores = sc.parallelizePairs(student_list2);
+
+        //join会根据key进行join返回javaPairRDD
+        JavaPairRDD<Integer, Tuple2<String, Integer>> join = student.join(scores);
+        join.foreach(new VoidFunction<Tuple2<Integer, Tuple2<String, Integer>>>() {
+            @Override
+            public void call(Tuple2<Integer, Tuple2<String, Integer>> integerTuple2Tuple2) throws Exception {
+                System.out.println("student's id:" + integerTuple2Tuple2._1 + " student's name : " + integerTuple2Tuple2._2._1
+                + " student's grade : " + integerTuple2Tuple2._2._2);
+            }
+        });
+        sc.close();
+    }
+
+    /**
+     * cogroup example.
+     */
+    private static void cogroup(){
+
+    }
+
 }

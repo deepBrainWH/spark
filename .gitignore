@@ -2,4 +2,4 @@
 target/*
 test/*
 out/*
-.vscode/*
+**/.vscode

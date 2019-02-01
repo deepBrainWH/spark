@@ -7,3 +7,4 @@ if __name__ == "__main__":
     linecounts = pairs.reduceByKey(lambda x, y: x+y)
     for x in linecounts.collect():
         print(x[0], " appear ", x[1], " times.")
+        
