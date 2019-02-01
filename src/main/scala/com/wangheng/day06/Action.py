@@ -24,8 +24,15 @@ def take():
     for i in result_collect:
         print(i, end=" ")
 
+def countByKey():
+    sc = SparkContext('local', 'countByKey')
+    rdd = sc.parallelize([('class1', 'wangheng'), ('class1', 'huanhuan'), ('class3', 'kdlsdlds')], 1)
+    result = rdd.countByKey()
+    print(result)
+
 if __name__ == '__main__':
     # reduce()
     # collect()
     # count()
-    take()
+    # take()
+    countByKey()

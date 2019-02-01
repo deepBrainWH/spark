@@ -1,13 +1,16 @@
 package com.wangheng.day06;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
+import scala.Tuple2;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Action operation 实战
@@ -18,8 +21,10 @@ public class Action {
 //        collect();
 //        count();
 //        take();
-        saveAsTextFile();
+//        saveAsTextFile();
+        countByKey();
     }
+
 
     private static void reduce(){
         SparkConf conf = new SparkConf().setMaster("local").setAppName("reduce");
@@ -105,6 +110,27 @@ public class Action {
             }
         });
         resultRDD.saveAsTextFile("hdfs://localhost:9000/double_number");
+        sc.close();
+    }
+
+    /**
+     * countByKey action.
+     */
+    private static void countByKey(){
+        SparkConf conf = new SparkConf().setAppName("saveAsTextFile").setMaster("local");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+
+        List<Tuple2<String, String>> students = Arrays.asList(
+                new Tuple2<String, String>("class1", "wangheng"),
+                new Tuple2<String, String>("class1", "huanhuan"),
+                new Tuple2<String, String>("class2", "liukaowen"),
+                new Tuple2<String, String>("class3", "fangyong")
+        );
+        JavaPairRDD<String, String> studentRDD = sc.parallelizePairs(students, 1);
+        Map<String, Long> result = studentRDD.countByKey();
+        for(Map.Entry<String, Long> studentCount: result.entrySet()){
+            System.out.println(studentCount.getKey() + " : " + studentCount.getValue());
+        }
         sc.close();
     }
 

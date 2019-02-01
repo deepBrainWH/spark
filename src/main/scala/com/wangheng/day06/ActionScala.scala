@@ -7,8 +7,8 @@ object ActionScala {
 //    reduce()
 //    collect()
 //    count()
-
-    take()
+//    take()
+    countByKey()
   }
 
   def reduce(): Unit = {
@@ -47,5 +47,18 @@ object ActionScala {
     for(num<-taking){
       println(num)
     }
+  }
+
+  def countByKey():Unit={
+    val conf = new SparkConf().setAppName("reduce").setMaster("local")
+    val sc = new SparkContext(conf)
+    var studentRDD = sc.parallelize(Array(
+      Tuple2("class1", "wnagheng"),
+      Tuple2("class1", "huanhuan"),
+      Tuple2("class2", "liukaowen"),
+      Tuple2("class3", "kkkkk")
+    ))
+    val result = studentRDD.countByKey()
+    result.foreach(student=>println(student._1 + " : " + student._2))
   }
 }
