@@ -39,9 +39,6 @@ object WordCountScala {
     ssc.start()
     ssc.awaitTermination()
     ssc.stop()
-
-
-
   }
 
 }

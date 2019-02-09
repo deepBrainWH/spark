@@ -4,19 +4,16 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.VoidFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
 
 public class SparkSQL {
     public static void main(String[] args) {
-        createDataFrame();
+//        createDataFrame();
+        createDataFrame_newVersion();
 //        rdd2dataframe_1();
     }
 
@@ -35,6 +32,23 @@ public class SparkSQL {
         df.filter(df.col("age").gt(19)).show();
         df.groupBy(df.col("age")).count().show();
         sc.close();
+    }
+
+    private static void createDataFrame_newVersion(){
+        SparkSession spark = SparkSession.builder()
+                .appName("create data frame")
+                .master("local[*]")
+                .getOrCreate();
+        Dataset<Row> data = spark.read().json("hdfs://localhost:9000/test_data/test_data8.txt");
+        data.registerTempTable("people");
+        data.select(data.col("id"), data.col("age")).show();
+
+        Dataset<Row> sql_result = spark.sql("select * from people where age > 19");
+        Dataset<Student> map = sql_result.map((MapFunction<Row, Student>) row ->
+                new Student(Integer.valueOf(row.getAs("id").toString()),
+                        row.getAs("name").toString(), Integer.valueOf(row.getAs("age").toString())),
+                Encoders.javaSerialization(Student.class));
+        map.javaRDD().foreach((VoidFunction<Student>) student -> System.out.println(student.toString()));
     }
 
     private static void rdd2dataframe_1(){
@@ -61,12 +75,7 @@ public class SparkSQL {
         //讲查询出来的dataframe映射为javaRDD
         JavaRDD<Row> rowJavaRDD = result.javaRDD();
         //将rdd中的数据映射为student
-        JavaRDD<Student> result_student = rowJavaRDD.map(new Function<Row, Student>() {
-            @Override
-            public Student call(Row row) throws Exception {
-                return new Student(row.getInt(0), row.getString(2), row.getInt(1));
-            }
-        });
+        JavaRDD<Student> result_student = rowJavaRDD.map((Function<Row, Student>) row -> new Student(row.getInt(0), row.getString(2), row.getInt(1)));
 
         rowJavaRDD.foreach(new VoidFunction<Row>() {
             @Override
