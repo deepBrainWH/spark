@@ -24,11 +24,11 @@ public class JDBCDataSource {
     private static void runJDBCDatasetExample(SparkSession spark) throws ClassNotFoundException {
         Dataset<Row> jdbcDF = spark.read().format("jdbc")
                 .option("url", "jdbc:mysql://localhost:3306/program1")
-//                .option("dbtable", "Course")
+                .option("dbtable", "Course")
                 .option("user", "root")
                 .option("password", "mysql673")
                 .load();
-        jdbcDF.write().format("jdbc").option("dbtable", "student");
+//        jdbcDF.write().format("jdbc").option("dbtable", "student");
         jdbcDF.show();
     }
 }
