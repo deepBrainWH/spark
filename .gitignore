@@ -3,3 +3,9 @@ target/*
 test/*
 out/*
 **/.vscode
+spark-warehouse/
+src/main/resources/
+#src/main/scala/com/wangheng/mllib/day14/
+#src/main/scala/com/wangheng/serialization/
+#src/main/scala/com/wangheng/streaming/day13/
+#src/main/scala/com/wangheng/structuredStreaming/day12/

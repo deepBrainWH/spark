@@ -10,7 +10,7 @@ object Test1{
   def main(args: Array[String]): Unit = {
     //配置信息类
     val conf = new SparkConf().setAppName("SparkWC").setMaster("local[1]")
-    val sc: SparkContext = new SparkContext(conf)
+    val sc = new SparkContext(conf)
 
     //reading data.
     val lines = sc.textFile(args(0))

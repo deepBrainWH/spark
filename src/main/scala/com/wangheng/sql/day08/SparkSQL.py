@@ -1,6 +1,4 @@
-from pyspark import SparkContext
 from pyspark.sql import SparkSession
-
 
 if __name__ == '__main__':
     url = "jdbc:mysql://localhost:3306/program1?user=root;password=mysql673"

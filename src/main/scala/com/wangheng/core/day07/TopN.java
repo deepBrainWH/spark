@@ -47,6 +47,7 @@ public class TopN {
          */
         SparkConf conf = new SparkConf().setMaster("local").setAppName("groupTopN");
         JavaSparkContext sc = new JavaSparkContext(conf);
+        sc.setLogLevel("WARN");
         final Broadcast<Integer> broadcast = sc.broadcast(n);
         JavaRDD<String> lines = sc.textFile("/home/wangheng/Desktop/test_data/test_data7.txt", 1);
         JavaRDD<Tuple3<String, String, Integer>> pair = lines.map(new Function<String, Tuple3<String, String, Integer>>() {
