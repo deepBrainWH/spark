@@ -15,7 +15,7 @@ object TopNScala {
   def simpleTopN(): Unit={
     val conf = new SparkConf().setAppName("topN").setMaster("local")
     val sc = new SparkContext(conf)
-    val lines = sc.textFile("/home/wangheng/Desktop/test_data/test_data6.txt", 1)
+    val lines = sc.textFile("hdfs://dell:9000/test_data/test_data6.txt", 1)
     val pair = lines.map(num=>(num.toInt, num))
     val result = pair.sortByKey(ascending = false)
     val top3 = result.take(3)
@@ -27,7 +27,8 @@ object TopNScala {
   def groupTopN(): Unit={
     val conf = new SparkConf().setAppName("topN").setMaster("local")
     val sc = new SparkContext(conf)
-    val lines = sc.textFile("/home/wangheng/Desktop/test_data/test_data7.txt", 1)
+    sc.setLogLevel("WARN")
+    val lines = sc.textFile("hdfs://dell:9000/test_data/test_data7.txt", 1)
     val pair = lines.map(line=>(line.split(" ")(0), line.split(" ")(1), line.split(" ")(2)))
     val result = pair.sortBy(student=>student._3.toInt, ascending = false, numPartitions = 1)
     val result2 = result.groupBy(student=>student._1)
