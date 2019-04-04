@@ -15,6 +15,7 @@ object TopNScala {
   def simpleTopN(): Unit={
     val conf = new SparkConf().setAppName("topN").setMaster("local")
     val sc = new SparkContext(conf)
+    sc.setLogLevel("WARN")
     val lines = sc.textFile("hdfs://dell:9000/test_data/test_data6.txt", 1)
     val pair = lines.map(num=>(num.toInt, num))
     val result = pair.sortByKey(ascending = false)
